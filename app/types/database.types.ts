@@ -1,0 +1,70 @@
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[]
+
+export interface Database {
+  public: {
+    Tables: {
+      anecdotas: {
+        Row: {
+          id: string
+          titulo: string
+          subtitulo: string
+          departamento: string
+          distrito: string
+          edad: string
+          ocupacion: string | null
+          tiempo_relacion: string | null
+          periodo_infidelidad: string | null
+          datos_adicionales: string | null
+          enlaces_pruebas: string | null
+          pais: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          titulo: string
+          subtitulo: string
+          departamento: string
+          distrito: string
+          edad: string
+          ocupacion?: string | null
+          tiempo_relacion?: string | null
+          periodo_infidelidad?: string | null
+          datos_adicionales?: string | null
+          enlaces_pruebas?: string | null
+          pais?: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          titulo?: string
+          subtitulo?: string
+          departamento?: string
+          distrito?: string
+          edad?: string
+          ocupacion?: string | null
+          tiempo_relacion?: string | null
+          periodo_infidelidad?: string | null
+          datos_adicionales?: string | null
+          enlaces_pruebas?: string | null
+          pais?: string
+          created_at?: string
+        }
+      }
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      [_ in never]: never
+    }
+    Enums: {
+      [_ in never]: never
+    }
+  }
+}
