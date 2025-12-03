@@ -16,6 +16,10 @@ const links = computed(() => [[{
   icon: 'i-lucide-vote',
   to: `/customers/${id.value}/votacion`
 }, {
+  label: 'Refutaciones',
+  icon: 'i-lucide-message-circle-warning',
+  to: `/customers/${id.value}/refutaciones`
+}, {
   label: 'Relación',
   icon: 'i-lucide-heart',
   to: `/customers/${id.value}/relacion`

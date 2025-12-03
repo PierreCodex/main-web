@@ -8,7 +8,9 @@ const toast = useToast()
 // Estado
 const loading = ref(false)
 const showDenunciaModal = ref(false)
+const showRefutarModal = ref(false)
 const selectedMotivo = ref('')
+const evidenciaRefutacion = ref('')
 const yaVoto = ref(false)
 const tipoVotoActual = ref<string | null>(null)
 
@@ -135,6 +137,10 @@ async function registrarVoto(tipo: 'aprobar' | 'refutar' | 'denunciar', motivo?:
       votoData.motivo_denuncia = motivo
     }
 
+    if (tipo === 'refutar' && motivo) {
+      votoData.evidencia_refutacion = motivo
+    }
+
     const { error } = await supabase
       .from('votos')
       .insert(votoData)
@@ -173,10 +179,14 @@ async function registrarVoto(tipo: 'aprobar' | 'refutar' | 'denunciar', motivo?:
       color: tipo === 'aprobar' ? 'success' : tipo === 'refutar' ? 'warning' : 'error'
     })
 
-    // Cerrar modal si es denuncia
+    // Cerrar modales
     if (tipo === 'denunciar') {
       showDenunciaModal.value = false
       selectedMotivo.value = ''
+    }
+    if (tipo === 'refutar') {
+      showRefutarModal.value = false
+      evidenciaRefutacion.value = ''
     }
   } finally {
     loading.value = false
@@ -190,6 +200,15 @@ function handleDenuncia() {
     return
   }
   registrarVoto('denunciar', selectedMotivo.value)
+}
+
+// Manejar refutación
+function handleRefutacion() {
+  if (!evidenciaRefutacion.value.trim()) {
+    toast.add({ title: 'Proporciona evidencia o explicación', color: 'warning' })
+    return
+  }
+  registrarVoto('refutar', evidenciaRefutacion.value)
 }
 
 onMounted(() => {
@@ -272,7 +291,7 @@ onMounted(() => {
             class="flex-1"
             :loading="loading"
             :disabled="yaVoto"
-            @click="registrarVoto('refutar')"
+            @click="showRefutarModal = true"
           />
 
           <!-- Denunciar -->
@@ -343,6 +362,56 @@ onMounted(() => {
                 :loading="loading"
                 :disabled="!selectedMotivo"
                 @click="handleDenuncia"
+              />
+            </div>
+          </template>
+        </UCard>
+      </template>
+    </UModal>
+
+    <!-- Modal de Refutación -->
+    <UModal v-model:open="showRefutarModal">
+      <template #content>
+        <UCard>
+          <template #header>
+            <div class="flex items-center gap-2">
+              <UIcon name="i-lucide-x-circle" class="size-5 text-warning" />
+              <h3 class="font-semibold text-highlighted">Refutar Caso</h3>
+            </div>
+          </template>
+
+          <div class="space-y-4">
+            <p class="text-sm text-muted">
+              Proporciona evidencia o explicación de por qué refutas este caso:
+            </p>
+
+            <UTextarea
+              v-model="evidenciaRefutacion"
+              placeholder="Escribe aquí tu evidencia, enlaces, o explicación detallada..."
+              :rows="6"
+              autoresize
+              :maxrows="12"
+            />
+
+            <p class="text-xs text-muted">
+              Tu evidencia ayudará a la comunidad a evaluar mejor la veracidad del caso.
+            </p>
+          </div>
+
+          <template #footer>
+            <div class="flex justify-end gap-2">
+              <UButton
+                label="Cancelar"
+                color="neutral"
+                variant="ghost"
+                @click="showRefutarModal = false"
+              />
+              <UButton
+                label="Enviar Refutación"
+                color="warning"
+                :loading="loading"
+                :disabled="!evidenciaRefutacion.trim()"
+                @click="handleRefutacion"
               />
             </div>
           </template>

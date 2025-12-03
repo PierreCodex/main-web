@@ -290,8 +290,7 @@ onMounted(() => {
             size="lg"
             class="flex-1"
             :loading="loading"
-            :disabled="yaVoto"
-            @click="showRefutarModal = true"
+            @click="() => { console.log('Abriendo modal refutar'); showRefutarModal = true }"
           />
 
           <!-- Denunciar -->
@@ -380,7 +379,7 @@ onMounted(() => {
             </div>
           </template>
 
-          <div class="space-y-4 max-h-[60vh] overflow-y-auto">
+          <div class="space-y-4">
             <p class="text-sm text-muted">
               Proporciona evidencia o explicación de por qué refutas este caso:
             </p>
