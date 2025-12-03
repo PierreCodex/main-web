@@ -2,10 +2,7 @@
 import type { Anecdota } from '~/types'
 
 const route = useRoute()
-const id = computed(() => {
-  const paramId = route.params.id
-  return Array.isArray(paramId) ? paramId[0] : paramId
-})
+const id = computed(() => route.params.id as string)
 
 const supabase = useSupabaseClient()
 const toast = useToast()
@@ -17,7 +14,6 @@ const loading = ref(true)
 // Cargar datos
 async function loadAnecdota() {
   loading.value = true
-  console.log('Cargando anécdota con ID:', id.value)
   
   try {
     const { data, error } = await supabase
@@ -26,17 +22,13 @@ async function loadAnecdota() {
       .eq('id', id.value)
       .single()
 
-    console.log('Respuesta detalle:', { data, error })
-
     if (error) {
-      console.error('Error:', error)
       toast.add({ title: 'Error', description: error.message, color: 'error' })
       return
     }
 
     anecdota.value = data as Anecdota
   } catch (e: any) {
-    console.error('Exception:', e)
     toast.add({ title: 'Error', description: e.message, color: 'error' })
   } finally {
     loading.value = false

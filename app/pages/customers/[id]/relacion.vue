@@ -2,10 +2,7 @@
 import type { Anecdota } from '~/types'
 
 const route = useRoute()
-const id = computed(() => {
-  const paramId = route.params.id
-  return Array.isArray(paramId) ? paramId[0] : paramId
-})
+const id = computed(() => route.params.id as string)
 
 const supabase = useSupabaseClient()
 const toast = useToast()
