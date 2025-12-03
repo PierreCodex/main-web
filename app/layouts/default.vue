@@ -14,17 +14,18 @@ const links = [[{
     open.value = false
   }
 }, {
+  label: 'Infieles',
+  icon: 'i-lucide-users',
+  to: '/customers',
+  onSelect: () => {
+    open.value = false
+  }
+},
+ {
   label: 'Ranking',
   icon: 'i-lucide-inbox',
   to: '/inbox',
   badge: '4',
-  onSelect: () => {
-    open.value = false
-  }
-}, {
-  label: 'Customers',
-  icon: 'i-lucide-users',
-  to: '/customers',
   onSelect: () => {
     open.value = false
   }

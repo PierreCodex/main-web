@@ -134,21 +134,7 @@ const columns: TableColumn<Anecdota>[] = [
     header: 'Edad',
     cell: ({ row }) => row.original.edad ? `${row.original.edad} años` : '-'
   },
-  {
-    accessorKey: 'ocupacion',
-    header: 'Ocupación',
-    cell: ({ row }) => row.original.ocupacion || '-'
-  },
-  {
-    accessorKey: 'tiempo_relacion',
-    header: 'Tiempo Relación',
-    cell: ({ row }) => row.original.tiempo_relacion || '-'
-  },
-  {
-    accessorKey: 'periodo_infidelidad',
-    header: 'Período Infidelidad',
-    cell: ({ row }) => row.original.periodo_infidelidad || '-'
-  },
+  
   {
     accessorKey: 'created_at',
     header: 'Fecha',
@@ -160,26 +146,23 @@ const columns: TableColumn<Anecdota>[] = [
   },
   {
     id: 'actions',
+    header: 'Acciones',
     cell: ({ row }) => {
       return h(
         'div',
-        { class: 'text-right' },
-        h(
-          UDropdownMenu,
-          {
-            content: {
-              align: 'end'
-            },
-            items: getRowItems(row)
-          },
-          () =>
-            h(UButton, {
-              icon: 'i-lucide-ellipsis-vertical',
-              color: 'neutral',
-              variant: 'ghost',
-              class: 'ml-auto'
-            })
-        )
+        { class: 'flex items-center justify-center w-full' },
+        [
+          h(UButton, {
+            label: 'Ver chisme',
+            icon: 'i-lucide-eye',
+            variant: 'solid',
+            size: 'xs',
+            class: 'bg-rose-500 hover:bg-rose-600 text-white',
+            onClick: () => {
+              navigateTo(`/customers/${row.original.id}`)
+            }
+          })
+        ]
       )
     }
   }
