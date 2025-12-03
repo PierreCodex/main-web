@@ -29,39 +29,41 @@ const links = [[{
   onSelect: () => {
     open.value = false
   }
-}, {
-  label: 'Settings',
-  to: '/settings',
-  icon: 'i-lucide-settings',
-  defaultOpen: true,
-  type: 'trigger',
-  children: [{
-    label: 'General',
-    to: '/settings',
-    exact: true,
-    onSelect: () => {
-      open.value = false
-    }
-  }, {
-    label: 'Members',
-    to: '/settings/members',
-    onSelect: () => {
-      open.value = false
-    }
-  }, {
-    label: 'Notifications',
-    to: '/settings/notifications',
-    onSelect: () => {
-      open.value = false
-    }
-  }, {
-    label: 'Security',
-    to: '/settings/security',
-    onSelect: () => {
-      open.value = false
-    }
-  }]
-}], [{
+}
+// {
+//   label: 'Settings',
+//   to: '/settings',
+//   icon: 'i-lucide-settings',
+//   defaultOpen: true,
+//   type: 'trigger',
+//   children: [{
+//     label: 'General',
+//     to: '/settings',
+//     exact: true,
+//     onSelect: () => {
+//       open.value = false
+//     }
+//   }, {
+//     label: 'Members',
+//     to: '/settings/members',
+//     onSelect: () => {
+//       open.value = false
+//     }
+//   }, {
+//     label: 'Notifications',
+//     to: '/settings/notifications',
+//     onSelect: () => {
+//       open.value = false
+//     }
+//   }, {
+//     label: 'Security',
+//     to: '/settings/security',
+//     onSelect: () => {
+//       open.value = false
+//     }
+//   }]
+// }
+], [{
   label: 'Legal y Privacidad',
   icon: 'i-lucide-scale',
   to: '/legal'
@@ -95,18 +97,18 @@ onMounted(async () => {
   }
 
   toast.add({
-    title: 'We use first-party cookies to enhance your experience on our website.',
+    title: 'Usamos cookies propias para mejorar tu experiencia en nuestro sitio web.',
     duration: 0,
     close: false,
     actions: [{
-      label: 'Accept',
+      label: 'Aceptar',
       color: 'neutral',
       variant: 'outline',
       onClick: () => {
         cookie.value = 'accepted'
       }
     }, {
-      label: 'Opt out',
+      label: 'Rechazar',
       color: 'neutral',
       variant: 'ghost'
     }]
