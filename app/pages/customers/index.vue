@@ -8,6 +8,7 @@ import type { Anecdota } from '~/types'
 const UButton = resolveComponent('UButton')
 const UBadge = resolveComponent('UBadge')
 const UDropdownMenu = resolveComponent('UDropdownMenu')
+const UAvatar = resolveComponent('UAvatar')
 
 const supabase = useSupabaseClient()
 const toast = useToast()
@@ -82,7 +83,39 @@ function formatDate(dateString: string) {
   })
 }
 
+// Función para obtener la primera imagen de evidencia
+function getFirstImage(enlaces_pruebas: string | null): string | null {
+  if (!enlaces_pruebas) return null
+  
+  const enlaces = enlaces_pruebas.split(/[,\n]/).map(e => e.trim()).filter(e => e.length > 0)
+  const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp', '.svg']
+  
+  for (const url of enlaces) {
+    const lowerUrl = url.toLowerCase()
+    // Si es del bucket de evidencias de Supabase o tiene extensión de imagen
+    if ((url.includes('supabase') && url.includes('/evidencias/')) ||
+        imageExtensions.some(ext => lowerUrl.includes(ext))) {
+      return url
+    }
+  }
+  return null
+}
+
 const columns: TableColumn<Anecdota>[] = [
+  {
+    id: 'avatar',
+    header: '',
+    cell: ({ row }) => {
+      const imagen = getFirstImage(row.original.enlaces_pruebas)
+      return h(UAvatar, {
+        src: imagen || undefined,
+        alt: row.original.titulo,
+        icon: 'i-lucide-user',
+        size: 'lg',
+        class: 'ring-2 ring-rose-200 dark:ring-rose-800'
+      })
+    }
+  },
   {
     accessorKey: 'titulo',
     header: ({ column }) => {
