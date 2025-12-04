@@ -43,50 +43,65 @@ const { data: stats } = await useAsyncData('home-stats', async () => {
 
 const statCards = computed(() => [
   {
-    title: 'Total Registros',
-    icon: 'i-lucide-database',
-    value: stats.value?.total || 0
+    title: 'Infieles Registrados',
+    icon: 'i-lucide-heart-crack',
+    value: stats.value?.total || 0,
+    color: 'rose',
+    emoji: '💔'
   },
   {
     title: 'Países',
     icon: 'i-lucide-globe',
-    value: stats.value?.totalPaises || 0
+    value: stats.value?.totalPaises || 0,
+    color: 'pink',
+    emoji: '🌎'
   },
   {
     title: 'Departamentos',
     icon: 'i-lucide-map',
-    value: stats.value?.totalDepartamentos || 0
+    value: stats.value?.totalDepartamentos || 0,
+    color: 'fuchsia',
+    emoji: '📍'
   },
   {
     title: 'Distritos',
     icon: 'i-lucide-map-pin',
-    value: stats.value?.totalDistritos || 0
+    value: stats.value?.totalDistritos || 0,
+    color: 'purple',
+    emoji: '🏘️'
   }
 ])
 </script>
 
 <template>
-  <UPageGrid class="lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-px">
-    <UPageCard
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <div
       v-for="(stat, index) in statCards"
       :key="index"
-      :icon="stat.icon"
-      :title="stat.title"
-      to="/customers"
-      variant="subtle"
-      :ui="{
-        container: 'gap-y-1.5',
-        wrapper: 'items-start',
-        leading: 'p-2.5 rounded-full bg-primary/10 ring ring-inset ring-primary/25 flex-col',
-        title: 'font-normal text-muted text-xs uppercase'
-      }"
-      class="lg:rounded-none first:rounded-l-lg last:rounded-r-lg hover:z-1"
+      class="relative overflow-hidden p-5 rounded-xl border transition-all duration-300 hover:scale-105 hover:shadow-lg cursor-pointer group"
+      :class="`bg-${stat.color}-50 dark:bg-${stat.color}-950/20 border-${stat.color}-200 dark:border-${stat.color}-800 hover:border-${stat.color}-400`"
     >
-      <div class="flex items-center gap-2">
-        <span class="text-2xl font-semibold text-highlighted">
-          {{ stat.value }}
-        </span>
+      <!-- Emoji decorativo -->
+      <div class="absolute -right-2 -top-2 text-5xl opacity-20 group-hover:opacity-30 transition-opacity">
+        {{ stat.emoji }}
       </div>
-    </UPageCard>
-  </UPageGrid>
+      
+      <div class="relative z-10">
+        <div 
+          class="flex items-center justify-center size-10 rounded-full mb-3"
+          :class="`bg-${stat.color}-500/20`"
+        >
+          <UIcon :name="stat.icon" class="size-5" :class="`text-${stat.color}-500`" />
+        </div>
+        
+        <p class="text-3xl font-bold text-highlighted mb-1">
+          {{ stat.value.toLocaleString() }}
+        </p>
+        
+        <p class="text-sm text-muted font-medium">
+          {{ stat.title }}
+        </p>
+      </div>
+    </div>
+  </div>
 </template>

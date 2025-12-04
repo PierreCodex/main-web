@@ -14,8 +14,25 @@ export default defineNuxtConfig({
   css: ['~/assets/css/main.css'],
 
   routeRules: {
+    // Headers de seguridad para todas las rutas
+    '/**': {
+      headers: {
+        'X-Content-Type-Options': 'nosniff',
+        'X-Frame-Options': 'DENY',
+        'X-XSS-Protection': '1; mode=block',
+        'Referrer-Policy': 'strict-origin-when-cross-origin',
+        'Permissions-Policy': 'camera=(), microphone=(), geolocation=()'
+      }
+    },
+    // CORS restringido para APIs
     '/api/**': {
-      cors: true
+      cors: {
+        origin: process.env.NODE_ENV === 'production' 
+          ? ['https://registronegrodeinfieles.vercel.app', 'https://www.registronegrodeinfieles.vercel.app']
+          : ['http://localhost:3000'],
+        methods: ['GET', 'POST', 'OPTIONS'],
+        credentials: true
+      }
     }
   },
 

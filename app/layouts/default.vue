@@ -23,9 +23,15 @@ const links = [[{
 },
  {
   label: 'Ranking',
-  icon: 'i-lucide-inbox',
+  icon: 'i-lucide-trophy',
   to: '/inbox',
-  badge: '4',
+  onSelect: () => {
+    open.value = false
+  }
+}, {
+  label: 'Descubrir',
+  icon: 'i-lucide-sparkles',
+  to: '/descubrir',
   onSelect: () => {
     open.value = false
   }

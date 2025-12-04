@@ -43,50 +43,74 @@ onMounted(() => {
 <template>
   <div>
     <UPageCard
-      title="Relación"
-      description="Detalles sobre la relación y el período de infidelidad"
+      title="Detalles del Caso"
+      description="Ubicación, relación e historia completa"
       variant="naked"
       class="mb-4"
     />
 
     <!-- Loading -->
     <div v-if="loading" class="flex items-center justify-center py-12">
-      <UIcon name="i-lucide-loader-2" class="size-8 animate-spin text-primary" />
+      <UIcon name="i-lucide-loader-2" class="size-8 animate-spin text-rose-500" />
     </div>
 
     <!-- Contenido -->
-    <UPageCard v-else-if="anecdota" variant="subtle">
-      <!-- Tiempo de relación -->
-      <div class="flex max-sm:flex-col justify-between items-start gap-4">
-        <div>
-          <p class="font-medium text-highlighted">Tiempo de relación</p>
-          <p class="text-sm text-muted">Duración de la relación</p>
+    <template v-else-if="anecdota">
+      <!-- Sección de la Relación -->
+      <UPageCard v-if="anecdota.tiempo_relacion || anecdota.periodo_infidelidad" variant="subtle" class="mb-4 border-l-4 border-l-red-500">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="flex items-center justify-center size-10 rounded-lg bg-red-500/10">
+            <UIcon name="i-lucide-heart-off" class="size-5 text-red-500" />
+          </div>
+          <div>
+            <h3 class="font-semibold text-highlighted">La Traición</h3>
+            <p class="text-xs text-muted">Detalles de la infidelidad</p>
+          </div>
         </div>
-        <p class="text-highlighted">{{ anecdota.tiempo_relacion || '-' }}</p>
-      </div>
-      <USeparator />
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div v-if="anecdota.tiempo_relacion" class="p-3 rounded-lg bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800">
+            <div class="flex items-center gap-2 mb-1">
+              <UIcon name="i-lucide-timer" class="size-4 text-red-500" />
+              <span class="text-xs text-muted">Tiempo de Relación</span>
+            </div>
+            <p class="font-medium text-highlighted">{{ anecdota.tiempo_relacion }}</p>
+          </div>
+          <div v-if="anecdota.periodo_infidelidad" class="p-3 rounded-lg bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800">
+            <div class="flex items-center gap-2 mb-1">
+              <UIcon name="i-lucide-calendar-x" class="size-4 text-red-500" />
+              <span class="text-xs text-muted">Período de Infidelidad</span>
+            </div>
+            <p class="font-medium text-highlighted">{{ anecdota.periodo_infidelidad }}</p>
+          </div>
+        </div>
+      </UPageCard>
 
-      <!-- Período de infidelidad -->
-      <div class="flex max-sm:flex-col justify-between items-start gap-4">
-        <div>
-          <p class="font-medium text-highlighted">Período de infidelidad</p>
-          <p class="text-sm text-muted">Duración de la infidelidad</p>
+      <!-- Datos adicionales / Historia -->
+      <UPageCard v-if="anecdota.datos_adicionales" variant="subtle" class="border-l-4 border-l-orange-500">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="flex items-center justify-center size-10 rounded-lg bg-orange-500/10">
+            <UIcon name="i-lucide-scroll-text" class="size-5 text-orange-500" />
+          </div>
+          <div>
+            <h3 class="font-semibold text-highlighted">La Historia Completa</h3>
+            <p class="text-xs text-muted">Detalles adicionales del caso</p>
+          </div>
         </div>
-        <p class="text-highlighted">{{ anecdota.periodo_infidelidad || '-' }}</p>
-      </div>
-      <USeparator />
+        
+        <div class="p-4 rounded-lg bg-orange-50 dark:bg-orange-950/20 border border-orange-200 dark:border-orange-800">
+          <p class="text-sm text-highlighted whitespace-pre-wrap leading-relaxed">{{ anecdota.datos_adicionales }}</p>
+        </div>
+      </UPageCard>
 
-      <!-- Datos adicionales -->
-      <div class="flex flex-col gap-2">
-        <div>
-          <p class="font-medium text-highlighted">Datos adicionales</p>
-          <p class="text-sm text-muted">Información extra sobre el caso</p>
+      <!-- Si no hay datos adicionales -->
+      <UPageCard v-if="!anecdota.tiempo_relacion && !anecdota.periodo_infidelidad && !anecdota.datos_adicionales" variant="subtle" class="mt-4">
+        <div class="flex flex-col items-center justify-center py-8 gap-3">
+          <UIcon name="i-lucide-file-question" class="size-10 text-muted" />
+          <p class="text-muted text-sm">No hay detalles adicionales registrados para este caso</p>
         </div>
-        <p class="text-highlighted whitespace-pre-wrap mt-2 p-3 bg-muted/10 rounded-lg">
-          {{ anecdota.datos_adicionales || 'Sin datos adicionales' }}
-        </p>
-      </div>
-    </UPageCard>
+      </UPageCard>
+    </template>
 
     <!-- Error -->
     <UPageCard v-else variant="subtle">

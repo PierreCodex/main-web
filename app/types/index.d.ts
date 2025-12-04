@@ -28,6 +28,14 @@ export interface Anecdota {
   created_at: string
 }
 
+export interface Comentario {
+  id: string
+  anecdota_id: string
+  contenido: string
+  autor_anonimo: string
+  created_at: string
+}
+
 export interface Mail {
   id: number
   unread?: boolean

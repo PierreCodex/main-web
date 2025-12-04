@@ -12,6 +12,10 @@ const links = computed(() => [[{
   to: `/customers/${id.value}`,
   exact: true
 }, {
+  label: 'Detalles del Caso',
+  icon: 'i-lucide-scroll-text',
+  to: `/customers/${id.value}/relacion`
+},{
   label: 'Votación del Caso',
   icon: 'i-lucide-vote',
   to: `/customers/${id.value}/votacion`
@@ -20,9 +24,9 @@ const links = computed(() => [[{
   icon: 'i-lucide-message-circle-warning',
   to: `/customers/${id.value}/refutaciones`
 }, {
-  label: 'Relación',
-  icon: 'i-lucide-heart',
-  to: `/customers/${id.value}/relacion`
+  label: 'Comentarios',
+  icon: 'i-lucide-message-circle',
+  to: `/customers/${id.value}/comentarios`
 }, {
   label: 'Pruebas',
   icon: 'i-lucide-link',
