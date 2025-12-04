@@ -90,8 +90,30 @@ function handleFileChange(event: Event) {
   const target = event.target as HTMLInputElement
   if (target.files) {
     const newFiles = Array.from(target.files)
-    // Validar tamaño máximo 10MB
-    const validFiles = newFiles.filter(file => file.size <= 10 * 1024 * 1024)
+    // Validar: solo imágenes y máximo 5MB
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
+    const maxSize = 5 * 1024 * 1024 // 5MB
+    
+    const validFiles = newFiles.filter(file => {
+      if (!allowedTypes.includes(file.type)) {
+        toast.add({
+          title: 'Archivo no permitido',
+          description: `"${file.name}" no es una imagen válida. Solo se permiten JPG, PNG, GIF y WebP.`,
+          color: 'warning'
+        })
+        return false
+      }
+      if (file.size > maxSize) {
+        toast.add({
+          title: 'Archivo muy grande',
+          description: `"${file.name}" excede el límite de 5MB.`,
+          color: 'warning'
+        })
+        return false
+      }
+      return true
+    })
+    
     archivosEvidencia.value.push(...validFiles)
   }
   // Reset input para permitir seleccionar el mismo archivo
@@ -121,42 +143,85 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
     // Procesar enlaces (filtrar vacíos)
     const enlaces = enlacesEvidencia.value.filter(e => e.trim() !== '')
     
-    // TODO: Subir archivos a Supabase Storage si hay
+    // Subir archivos a Supabase Storage si hay
     let urlsArchivos: string[] = []
+    console.log('Archivos a subir:', archivosEvidencia.value.length)
+    
     if (archivosEvidencia.value.length > 0) {
       for (const archivo of archivosEvidencia.value) {
-        const fileName = `${Date.now()}_${archivo.name}`
-        const { data, error: uploadError } = await supabase.storage
-          .from('evidencias')
-          .upload(fileName, archivo)
+        // Generar nombre único: timestamp_random_nombreoriginal
+        const randomId = Math.random().toString(36).substring(2, 8)
+        const fileName = `${Date.now()}_${randomId}_${archivo.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`
+        console.log('Intentando subir:', fileName)
         
-        if (!uploadError && data) {
-          const { data: publicUrl } = supabase.storage
+        try {
+          const { data, error: uploadError } = await supabase.storage
             .from('evidencias')
-            .getPublicUrl(fileName)
-          urlsArchivos.push(publicUrl.publicUrl)
+            .upload(fileName, archivo, {
+              cacheControl: '3600',
+              upsert: false
+            })
+          
+          console.log('Resultado upload:', { data, uploadError })
+          
+          if (uploadError) {
+            console.error('Error subiendo archivo:', uploadError.message)
+            toast.add({
+              title: 'Advertencia',
+              description: `No se pudo subir "${archivo.name}": ${uploadError.message}`,
+              color: 'warning'
+            })
+            continue
+          }
+          
+          if (data) {
+            const { data: publicUrl } = supabase.storage
+              .from('evidencias')
+              .getPublicUrl(data.path)
+            
+            console.log('URL pública obtenida:', publicUrl)
+            
+            if (publicUrl?.publicUrl) {
+              urlsArchivos.push(publicUrl.publicUrl)
+              console.log('URL agregada:', publicUrl.publicUrl)
+            }
+          }
+        } catch (err: any) {
+          console.error('Error en upload:', err)
+          toast.add({
+            title: 'Error',
+            description: `Error al subir "${archivo.name}"`,
+            color: 'error'
+          })
         }
       }
     }
+    
+    console.log('URLs finales:', urlsArchivos)
+    console.log('Enlaces manuales:', enlaces)
 
     // Combinar enlaces y URLs de archivos
-    const todasLasEvidencias = [...enlaces, ...urlsArchivos].join('\n')
+    const todasLasEvidencias = [...enlaces, ...urlsArchivos].filter(Boolean).join('\n')
+    console.log('Todas las evidencias combinadas:', todasLasEvidencias)
+
+    const insertData = {
+      titulo: event.data.titulo,
+      subtitulo: event.data.subtitulo,
+      departamento: event.data.departamento,
+      distrito: event.data.distrito,
+      edad: event.data.edad,
+      ocupacion: event.data.ocupacion || null,
+      tiempo_relacion: event.data.tiempo_relacion || null,
+      periodo_infidelidad: event.data.periodo_infidelidad || null,
+      datos_adicionales: event.data.datos_adicionales || null,
+      enlaces_pruebas: todasLasEvidencias || null,
+      pais: event.data.pais
+    }
+    console.log('Datos a insertar:', insertData)
 
     const { error } = await supabase
       .from('anecdotas')
-      .insert({
-        titulo: event.data.titulo,
-        subtitulo: event.data.subtitulo,
-        departamento: event.data.departamento,
-        distrito: event.data.distrito,
-        edad: event.data.edad,
-        ocupacion: event.data.ocupacion || null,
-        tiempo_relacion: event.data.tiempo_relacion || null,
-        periodo_infidelidad: event.data.periodo_infidelidad || null,
-        datos_adicionales: event.data.datos_adicionales || null,
-        enlaces_pruebas: todasLasEvidencias || null,
-        pais: event.data.pais
-      })
+      .insert(insertData)
 
     if (error) throw error
 
@@ -401,7 +466,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 
           <!-- Subir Archivos -->
           <div class="mb-4">
-            <label class="block text-sm font-medium mb-2">Subir Archivos (Imágenes o PDF)</label>
+            <label class="block text-sm font-medium mb-2">Subir Imágenes</label>
             <div class="flex gap-2">
               <div class="flex-1 flex items-center px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
                 <span class="text-sm text-muted">
@@ -419,12 +484,12 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
                 ref="fileInput"
                 type="file"
                 multiple
-                accept=".jpg,.jpeg,.png,.gif,.webp,.pdf"
+                accept="image/jpeg,image/png,image/gif,image/webp"
                 class="hidden"
                 @change="handleFileChange"
               />
             </div>
-            <p class="text-xs text-muted mt-1">Formatos permitidos: JPG, PNG, GIF, WebP, PDF. Máximo 10MB por archivo.</p>
+            <p class="text-xs text-muted mt-1">Solo imágenes: JPG, PNG, GIF, WebP. Máximo 5MB por archivo.</p>
             
             <!-- Lista de archivos seleccionados -->
             <div v-if="archivosEvidencia.length > 0" class="mt-2 space-y-1">
@@ -435,7 +500,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
               >
                 <div class="flex items-center gap-2">
                   <UIcon 
-                    :name="archivo.type.includes('pdf') ? 'i-lucide-file-text' : 'i-lucide-image'" 
+                    name="i-lucide-image" 
                     class="size-4 text-rose-500" 
                   />
                   <span class="text-sm truncate max-w-[200px]">{{ archivo.name }}</span>
